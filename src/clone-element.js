@@ -13,10 +13,10 @@ export function cloneElement(vnode, props, children) {
 		key,
 		ref,
 		i;
+
 	for (i in props) {
-		if (i == 'key') key = props[i];
-		else if (i == 'ref') ref = props[i];
-		else normalizedProps[i] = props[i];
+		if (!(i === 'key' || (typeof vnode.type !== 'function' && i === 'ref')))
+			normalizedProps[i] = props[i];
 	}
 
 	if (arguments.length > 3) {
@@ -33,7 +33,7 @@ export function cloneElement(vnode, props, children) {
 		vnode.type,
 		normalizedProps,
 		key || vnode.key,
-		ref || vnode.ref,
+		typeof vnode.type !== 'function' && (props.ref || vnode.ref),
 		null
 	);
 }

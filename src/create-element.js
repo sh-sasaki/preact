@@ -14,9 +14,8 @@ export function createElement(type, props, children) {
 		ref,
 		i;
 	for (i in props) {
-		if (i == 'key') key = props[i];
-		else if (i == 'ref') ref = props[i];
-		else normalizedProps[i] = props[i];
+		if (!(i === 'key' || (typeof type !== 'function' && i === 'ref')))
+			normalizedProps[i] = props[i];
 	}
 
 	if (arguments.length > 3) {
