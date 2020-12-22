@@ -83,7 +83,7 @@ describe('Fragment', () => {
 		render(
 			<Fragment>
 				<span>foo</span>
-			</Fragment>,
+			</Fragment>
 		);
 
 		expect(scratch.innerHTML).to.equal('<span>foo</span>');
@@ -97,7 +97,7 @@ describe('Fragment', () => {
 		render(
 			<Fragment>
 				hello <span>world</span>
-			</Fragment>,
+			</Fragment>
 		);
 
 		expect(scratch.innerHTML).to.equal('hello <span>world</span>');
@@ -109,7 +109,7 @@ describe('Fragment', () => {
 				<Fragment>
 					<span>world</span>
 					{null}
-				</Fragment>,
+				</Fragment>
 			);
 		};
 		expect(fn).not.to.throw();
@@ -119,7 +119,7 @@ describe('Fragment', () => {
 			<Fragment>
 				<span>world</span>
 				<p>Hello</p>
-			</Fragment>,
+			</Fragment>
 		);
 		expect(scratch.innerHTML).to.equal('<span>world</span><p>Hello</p>');
 
@@ -131,7 +131,7 @@ describe('Fragment', () => {
 				<span>world</span>
 				{null}
 				<span>world</span>
-			</Fragment>,
+			</Fragment>
 		);
 		expect(scratch.innerHTML).to.equal('<span>world</span><span>world</span>');
 
@@ -140,7 +140,7 @@ describe('Fragment', () => {
 				<span>world</span>
 				Hello
 				<span>world</span>
-			</Fragment>,
+			</Fragment>
 		);
 		expect(scratch.innerHTML).to.equal(
 			'<span>world</span>Hello<span>world</span>'
@@ -799,7 +799,7 @@ describe('Fragment', () => {
 				<Fragment>foo</Fragment>
 				<Fragment />
 				bar
-			</Fragment>,
+			</Fragment>
 		);
 
 		expect(scratch.innerHTML).to.equal('spamfoobar');
@@ -814,7 +814,7 @@ describe('Fragment', () => {
 			<Fragment>
 				<Fragment>foo</Fragment>
 				<Fragment>bar</Fragment>
-			</Fragment>,
+			</Fragment>
 		);
 
 		expect(scratch.innerHTML).to.equal('foobar');
@@ -839,7 +839,7 @@ describe('Fragment', () => {
 				</Fragment>
 				<div>4</div>
 				<div>5</div>
-			</div>,
+			</div>
 		);
 
 		expect(scratch.innerHTML).to.equal(
@@ -1049,7 +1049,7 @@ describe('Fragment', () => {
 					<li>6</li>
 				</Fragment>
 				<li>7</li>
-			</ol>,
+			</ol>
 		);
 
 		expect(scratch.textContent).to.equal('01234567');

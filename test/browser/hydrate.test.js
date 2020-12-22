@@ -64,7 +64,7 @@ describe('hydrate()', () => {
 				<li>1</li>
 				<li>2</li>
 				<li>3</li>
-			</ul>,
+			</ul>
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -82,7 +82,7 @@ describe('hydrate()', () => {
 				<ListItem>1</ListItem>
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -100,7 +100,7 @@ describe('hydrate()', () => {
 				<ListItem>1</ListItem>
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(ul([li('1'), li('2'), li('3')]));
@@ -123,7 +123,7 @@ describe('hydrate()', () => {
 				<ListItem>1</ListItem>
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(ul([li('1'), li('2'), li('3')]));
@@ -173,7 +173,7 @@ describe('hydrate()', () => {
 					<ListItem>3</ListItem>
 				</Fragment>
 				<ListItem>4</ListItem>
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -200,7 +200,7 @@ describe('hydrate()', () => {
 					<ListItem>4</ListItem>
 				</List>
 				<div>sibling</div>
-			</Fragment>,
+			</Fragment>
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -232,7 +232,7 @@ describe('hydrate()', () => {
 					<ListItem>4</ListItem>
 				</List>
 				<div>sibling</div>
-			</Fragment>,
+			</Fragment>
 		);
 
 		const finalHtml = [
@@ -332,7 +332,7 @@ describe('hydrate()', () => {
 			<Fragment>
 				<Component foo="bar" />
 				<Component foo="baz" />
-			</Fragment>,
+			</Fragment>
 		);
 		expect(element.innerHTML).to.equal(
 			'<p class="hi">hello bar</p><p class="hi">hello baz</p>'

@@ -1,5 +1,11 @@
 import { setupRerender } from 'preact/test-utils';
-import { createElement, createRoot, Component, Fragment, hydrate } from 'preact';
+import {
+	createElement,
+	createRoot,
+	Component,
+	Fragment,
+	hydrate
+} from 'preact';
 import { setupScratch, teardown } from '../_util/helpers';
 import { div, span, input as inputStr, h1, h2 } from '../_util/dom';
 
@@ -158,7 +164,7 @@ describe('focus', () => {
 			<List>
 				<Input />
 				<ListItem>fooo</ListItem>
-			</List>,
+			</List>
 		);
 
 		const input = focusInput();
@@ -168,7 +174,7 @@ describe('focus', () => {
 			<List>
 				<ListItem>fooo</ListItem>
 				<Input />
-			</List>,
+			</List>
 		);
 		validateFocus(input);
 		expect(scratch.innerHTML).to.equal(getListHtml(['fooo'], []));
@@ -280,7 +286,7 @@ describe('focus', () => {
 				<Input />
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
-			</List>,
+			</List>
 		);
 
 		let input = focusInput();
@@ -293,7 +299,7 @@ describe('focus', () => {
 				<Input />
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(getListHtml([1], [2, 3]));
@@ -306,7 +312,7 @@ describe('focus', () => {
 				<Input />
 				<ListItem>2</ListItem>
 				{false && <ListItem>3</ListItem>}
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(getListHtml([1], [2]));
@@ -319,7 +325,7 @@ describe('focus', () => {
 				<Input />
 				{false && <ListItem>2</ListItem>}
 				{false && <ListItem>3</ListItem>}
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(getListHtml([1], []));
@@ -332,7 +338,7 @@ describe('focus', () => {
 				<Input />
 				{false && <ListItem>2</ListItem>}
 				{false && <ListItem>3</ListItem>}
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(getListHtml([], []));
@@ -340,9 +346,7 @@ describe('focus', () => {
 	});
 
 	it('should maintain focus when removing elements around input', () => {
-		render(
-			<DynamicList initialBefore={[0, 1]} initialAfter={[2, 3]} />,
-		);
+		render(<DynamicList initialBefore={[0, 1]} initialAfter={[2, 3]} />);
 
 		let input = focusInput();
 		expect(scratch.innerHTML).to.equal(getDynamicListHtml());
@@ -418,7 +422,7 @@ describe('focus', () => {
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
 				<Input />
-			</List>,
+			</List>
 		);
 
 		expect(scratch.innerHTML).to.equal(html);

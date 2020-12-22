@@ -94,7 +94,7 @@ describe('keys', () => {
 				<div>1</div>
 				<li key="a">a</li>
 				<li key="b">b</li>
-			</div>,
+			</div>
 		);
 
 		render(
@@ -102,7 +102,7 @@ describe('keys', () => {
 				<div>2</div>
 				<li key="b">b</li>
 				<li key="c">c</li>
-			</div>,
+			</div>
 		);
 
 		expect(scratch.innerHTML).to.equal(

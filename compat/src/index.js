@@ -6,7 +6,7 @@ import {
 	Component,
 	createContext,
 	Fragment,
-	createRoot,
+	createRoot
 } from 'preact';
 import {
 	useState,
@@ -132,7 +132,7 @@ export {
 	SuspenseList,
 	lazy,
 	__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
-	createRoot,
+	createRoot
 };
 
 // React copies the named exports to the default one.

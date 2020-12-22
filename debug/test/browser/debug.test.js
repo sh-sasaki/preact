@@ -1,4 +1,10 @@
-import { createElement, createRoot, createRef, Component, Fragment } from 'preact';
+import {
+	createElement,
+	createRoot,
+	createRef,
+	Component,
+	Fragment
+} from 'preact';
 import {
 	setupScratch,
 	teardown,
@@ -51,6 +57,12 @@ describe('debug', () => {
 		let fn = () => render(<div />);
 		expect(fn).to.throw(/valid HTML node/);
 		expect(fn).to.throw(/<div/);
+	});
+
+	it('should warn on invalid unitless inline CSS value', () => {
+		render(<div style={{ padding: 5 }} />, scratch);
+		expect(console.warn).to.be.calledOnce;
+		expect(console.warn.args[0][0]).to.match(/CSS value is missing a unit/);
 	});
 
 	it('should print an error with (function) component name when available', () => {

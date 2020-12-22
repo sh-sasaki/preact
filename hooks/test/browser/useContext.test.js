@@ -34,12 +34,12 @@ describe('useContext', () => {
 		render(
 			<Context.Provider value={42}>
 				<Comp />
-			</Context.Provider>,
+			</Context.Provider>
 		);
 		render(
 			<Context.Provider value={69}>
 				<Comp />
-			</Context.Provider>,
+			</Context.Provider>
 		);
 
 		expect(values).to.deep.equal([13, 42, 69]);
@@ -155,7 +155,7 @@ describe('useContext', () => {
 				<Bar.Provider value={10}>
 					<Comp />
 				</Bar.Provider>
-			</Foo.Provider>,
+			</Foo.Provider>
 		);
 
 		expect(spy).to.be.calledOnce;
@@ -166,7 +166,7 @@ describe('useContext', () => {
 				<Bar.Provider value={42}>
 					<Comp />
 				</Bar.Provider>
-			</Foo.Provider>,
+			</Foo.Provider>
 		);
 
 		expect(spy).to.be.calledTwice;
@@ -189,14 +189,14 @@ describe('useContext', () => {
 		render(
 			<Context.Provider ref={p => (provider = p)} value={42}>
 				<Comp />
-			</Context.Provider>,
+			</Context.Provider>
 		);
 		subSpy = sinon.spy(provider, 'sub');
 
 		render(
 			<Context.Provider value={69}>
 				<Comp />
-			</Context.Provider>,
+			</Context.Provider>
 		);
 		expect(subSpy).to.not.have.been.called;
 

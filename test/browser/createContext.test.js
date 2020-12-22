@@ -49,7 +49,7 @@ describe('createContext', () => {
 						}}
 					</Consumer>
 				</div>
-			</Provider>,
+			</Provider>
 		);
 
 		// initial render does not invoke anything but render():
@@ -131,7 +131,7 @@ describe('createContext', () => {
 						);
 					}}
 				</Consumer>
-			</Provider>,
+			</Provider>
 		);
 
 		// initial render does not invoke anything but render():
@@ -190,7 +190,7 @@ describe('createContext', () => {
 						}}
 					</ThemeConsumer>
 				</DataProvider>
-			</ThemeProvider>,
+			</ThemeProvider>
 		);
 
 		// initial render does not invoke anything but render():
@@ -233,7 +233,7 @@ describe('createContext', () => {
 						);
 					}}
 				</Consumer>
-			</Provider>,
+			</Provider>
 		);
 
 		// initial render does not invoke anything but render():
@@ -272,7 +272,7 @@ describe('createContext', () => {
 						<Consumer>{data => <Inner {...data} />}</Consumer>
 					</NoUpdate>
 				</Provider>
-			</div>,
+			</div>
 		);
 
 		expect(Inner.prototype.render).to.have.been.calledOnce;
@@ -284,7 +284,7 @@ describe('createContext', () => {
 						<Consumer>{data => <Inner {...data} />}</Consumer>
 					</NoUpdate>
 				</Provider>
-			</div>,
+			</div>
 		);
 
 		expect(Inner.prototype.render).to.have.been.calledOnce;
@@ -342,7 +342,7 @@ describe('createContext', () => {
 		render(
 			<Provider value={CONTEXT}>
 				<Outer />
-			</Provider>,
+			</Provider>
 		);
 
 		// initial render does not invoke anything but render():
@@ -480,7 +480,7 @@ describe('createContext', () => {
 						return <Inner {...data} />;
 					}}
 				</Consumer>
-			</Provider>,
+			</Provider>
 		);
 
 		// initial render does not invoke anything but render():
@@ -521,7 +521,7 @@ describe('createContext', () => {
 				<NoUpdate>
 					<Consumer>{data => <Inner {...data} />}</Consumer>
 				</NoUpdate>
-			</Provider>,
+			</Provider>
 		);
 
 		render(
@@ -529,7 +529,7 @@ describe('createContext', () => {
 				<NoUpdate>
 					<Consumer>{data => <Inner {...data} />}</Consumer>
 				</NoUpdate>
-			</Provider>,
+			</Provider>
 		);
 
 		// Rendered twice, should called just one 'Consumer' render
@@ -544,7 +544,7 @@ describe('createContext', () => {
 					<NoUpdate>
 						<Consumer>{data => <Inner {...data} />}</Consumer>
 					</NoUpdate>
-				</Provider>,
+				</Provider>
 			);
 		});
 
@@ -617,14 +617,14 @@ describe('createContext', () => {
 			render(
 				<Provider value={CONTEXT}>
 					<Consumer>{data => <Inner {...data} />}</Consumer>
-				</Provider>,
+				</Provider>
 			);
 
 			// Not calling re-render since it's gonna get called with the same Consumer function
 			render(
 				<Provider value={CONTEXT}>
 					<Consumer>{data => <Inner {...data} />}</Consumer>
-				</Provider>,
+				</Provider>
 			);
 		});
 
@@ -718,7 +718,7 @@ describe('createContext', () => {
 					<Provider value="bob">
 						<App />
 					</Provider>
-				</Provider>,
+				</Provider>
 			);
 			expect(actual).to.deep.equal('bob');
 		});
@@ -759,7 +759,7 @@ describe('createContext', () => {
 							<Inner />
 						</NewContext>
 					</OldContext>
-				</Foo.Provider>,
+				</Foo.Provider>
 			);
 
 			expect(spy).to.be.calledWithMatch({ foo: 'foo' });
@@ -790,7 +790,7 @@ describe('createContext', () => {
 			render(
 				<Foo.Provider value="foo">
 					<App />
-				</Foo.Provider>,
+				</Foo.Provider>
 			);
 
 			render(null);

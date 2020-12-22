@@ -62,7 +62,7 @@ render(
 		initialInput: 'The input',
 		input: 'New input',
 		key: '1'
-	}),
+	})
 );
 render(h('div', { title: 'test', key: '1' }));
 render(h(DummyComponent, { initialInput: 'The input', key: '1' }));
@@ -71,7 +71,7 @@ render(
 		initialInput: 'The input',
 		input: 'New input',
 		key: '1'
-	}),
+	})
 );
 
 // Accessing children

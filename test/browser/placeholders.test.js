@@ -187,7 +187,7 @@ describe('null placeholders', () => {
 			<App
 				first={<Stateful name="first" ref={s1ref} />}
 				second={<Stateful name="second" ref={s2ref} />}
-			/>,
+			/>
 		);
 		expect(scratch.innerHTML).to.equal(
 			'<div>first: 1</div><div>second: 0</div><div>third: 2</div>'

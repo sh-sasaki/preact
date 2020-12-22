@@ -18,7 +18,7 @@ describe('refs', () => {
 
 	beforeEach(() => {
 		scratch = setupScratch();
-		({ render } = createRoot(scratch))
+		({ render } = createRoot(scratch));
 		rerender = setupRerender();
 	});
 
@@ -280,7 +280,7 @@ describe('refs', () => {
 			<div>
 				<Foo ref={foo} a="a" />
 				<Bar ref={bar} b="b" />
-			</div>,
+			</div>
 		);
 
 		expect(Foo.prototype.render).to.have.been.calledWithMatch(
@@ -323,7 +323,7 @@ describe('refs', () => {
 		render(
 			<div>
 				<TestUnmount />
-			</div>,
+			</div>
 		);
 		outer = scratch.querySelector('#outer');
 		inner = scratch.querySelector('#inner');

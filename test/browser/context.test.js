@@ -10,7 +10,7 @@ describe('context', () => {
 
 	beforeEach(() => {
 		scratch = setupScratch();
-		({ render } = createRoot(scratch))
+		({ render } = createRoot(scratch));
 	});
 
 	afterEach(() => {

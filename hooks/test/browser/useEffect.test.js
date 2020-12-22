@@ -126,7 +126,7 @@ describe('useEffect', () => {
 			render(
 				<ErrorBoundary>
 					<Parent />
-				</ErrorBoundary>,
+				</ErrorBoundary>
 			)
 		);
 

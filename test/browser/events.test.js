@@ -162,7 +162,7 @@ describe('event handling', () => {
 			render(
 				<div onClickCapture={click} onFocusCapture={focus}>
 					<button />
-				</div>,
+				</div>
 			);
 
 			let root = scratch.firstChild;
@@ -188,7 +188,7 @@ describe('event handling', () => {
 			render(
 				<div onClick={click} onClickCapture={clickCapture}>
 					<button />
-				</div>,
+				</div>
 			);
 
 			let root = scratch.firstChild;

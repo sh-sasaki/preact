@@ -1,9 +1,5 @@
-import {
-	options,
-	toChildArray,
-	Component,
-	createRoot
-} from 'preact';
+import { options, toChildArray, Component, createRoot } from 'preact';
+import { IS_NON_DIMENSIONAL } from './util';
 
 export const REACT_ELEMENT_TYPE =
 	(typeof Symbol != 'undefined' && Symbol.for && Symbol.for('react.element')) ||
@@ -145,6 +141,15 @@ options.vnode = vnode => {
 			}
 
 			normalizedProps[i] = value;
+		}
+
+		let style = props.style;
+		if (typeof style === 'object') {
+			for (let i in style) {
+				if (typeof style[i] === 'number' && !IS_NON_DIMENSIONAL.test(i)) {
+					style[i] += 'px';
+				}
+			}
 		}
 
 		// Add support for array select values: <select multiple value={[]} />
