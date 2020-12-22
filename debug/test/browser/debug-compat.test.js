@@ -1,4 +1,4 @@
-import { createElement, render, createRef } from 'preact';
+import { createElement, createRoot, createRef } from 'preact';
 import { setupScratch, teardown } from '../../../test/_util/helpers';
 import './fakeDevTools';
 import 'preact/debug';
@@ -15,11 +15,14 @@ describe('debug compat', () => {
 	let scratch;
 	let errors = [];
 	let warnings = [];
+	let render;
 
 	beforeEach(() => {
 		errors = [];
 		warnings = [];
 		scratch = setupScratch();
+		({ render } = createRoot(scratch));
+
 		sinon.stub(console, 'error').callsFake(e => errors.push(e));
 		sinon.stub(console, 'warn').callsFake(w => warnings.push(w));
 	});
@@ -56,7 +59,7 @@ describe('debug compat', () => {
 
 			const ref = createRef();
 
-			render(<Foo ref={ref} text="123" />, scratch);
+			render(<Foo ref={ref} text="123" />);
 
 			expect(console.error).not.been.called;
 

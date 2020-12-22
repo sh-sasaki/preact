@@ -1,4 +1,4 @@
-import { createElement, render, Component, Fragment } from 'preact';
+import { createElement, Component, Fragment, createRoot } from 'preact';
 import { setupScratch, teardown } from '../_util/helpers';
 
 /** @jsx createElement */
@@ -6,8 +6,11 @@ import { setupScratch, teardown } from '../_util/helpers';
 describe('context', () => {
 	let scratch;
 
+	let render;
+
 	beforeEach(() => {
 		scratch = setupScratch();
+		({ render } = createRoot(scratch))
 	});
 
 	afterEach(() => {
@@ -54,7 +57,7 @@ describe('context', () => {
 		sinon.spy(Inner.prototype, 'componentDidUpdate');
 		sinon.spy(Inner.prototype, 'render');
 
-		render(<Outer />, scratch);
+		render(<Outer />);
 
 		expect(Outer.prototype.getChildContext).to.have.been.calledOnce;
 
@@ -62,7 +65,7 @@ describe('context', () => {
 		expect(Inner.prototype.render).to.have.been.calledWith({}, {}, CONTEXT);
 
 		CONTEXT.foo = 'bar';
-		render(<Outer {...PROPS} />, scratch);
+		render(<Outer {...PROPS} />);
 
 		expect(Outer.prototype.getChildContext).to.have.been.calledTwice;
 
@@ -126,7 +129,7 @@ describe('context', () => {
 		sinon.spy(Inner.prototype, 'componentDidUpdate');
 		sinon.spy(Inner.prototype, 'render');
 
-		render(<Outer />, scratch);
+		render(<Outer />);
 
 		expect(Outer.prototype.getChildContext).to.have.been.calledOnce;
 
@@ -134,7 +137,7 @@ describe('context', () => {
 		expect(Inner.prototype.render).to.have.been.calledWith({}, {}, CONTEXT);
 
 		CONTEXT.foo = 'bar';
-		render(<Outer {...PROPS} />, scratch);
+		render(<Outer {...PROPS} />);
 
 		expect(Outer.prototype.getChildContext).to.have.been.calledTwice;
 
@@ -197,7 +200,7 @@ describe('context', () => {
 		sinon.spy(Inner.prototype, 'render');
 		sinon.spy(InnerMost.prototype, 'render');
 
-		render(<Outer />, scratch);
+		render(<Outer />);
 
 		expect(Inner.prototype.render).to.have.been.calledWith(
 			{},
@@ -231,7 +234,7 @@ describe('context', () => {
 			}
 		}
 
-		render(<Wrapper />, scratch);
+		render(<Wrapper />);
 		expect(Foo.args[0][1]).to.deep.equal(context);
 	});
 });

@@ -1,7 +1,7 @@
 import { setupRerender, act } from 'preact/test-utils';
 import {
 	createElement,
-	render,
+	createRoot,
 	Component,
 	createContext,
 	Fragment
@@ -13,9 +13,11 @@ import { setupScratch, teardown } from '../_util/helpers';
 describe('createContext', () => {
 	let scratch;
 	let rerender;
+	let render;
 
 	beforeEach(() => {
 		scratch = setupScratch();
+		({ render } = createRoot(scratch));
 		rerender = setupRerender();
 	});
 
@@ -48,7 +50,6 @@ describe('createContext', () => {
 					</Consumer>
 				</div>
 			</Provider>,
-			scratch
 		);
 
 		// initial render does not invoke anything but render():
@@ -87,7 +88,7 @@ describe('createContext', () => {
 				</Layout>
 			</State>
 		);
-		render(<App />, scratch);
+		render(<App />);
 		expect(renders).to.equal(1);
 		set({ i: 2 });
 		rerender();
@@ -131,7 +132,6 @@ describe('createContext', () => {
 					}}
 				</Consumer>
 			</Provider>,
-			scratch
 		);
 
 		// initial render does not invoke anything but render():
@@ -191,7 +191,6 @@ describe('createContext', () => {
 					</ThemeConsumer>
 				</DataProvider>
 			</ThemeProvider>,
-			scratch
 		);
 
 		// initial render does not invoke anything but render():
@@ -235,7 +234,6 @@ describe('createContext', () => {
 					}}
 				</Consumer>
 			</Provider>,
-			scratch
 		);
 
 		// initial render does not invoke anything but render():
@@ -275,7 +273,6 @@ describe('createContext', () => {
 					</NoUpdate>
 				</Provider>
 			</div>,
-			scratch
 		);
 
 		expect(Inner.prototype.render).to.have.been.calledOnce;
@@ -288,7 +285,6 @@ describe('createContext', () => {
 					</NoUpdate>
 				</Provider>
 			</div>,
-			scratch
 		);
 
 		expect(Inner.prototype.render).to.have.been.calledOnce;
@@ -347,7 +343,6 @@ describe('createContext', () => {
 			<Provider value={CONTEXT}>
 				<Outer />
 			</Provider>,
-			scratch
 		);
 
 		// initial render does not invoke anything but render():
@@ -417,13 +412,13 @@ describe('createContext', () => {
 			}
 		}
 
-		render(<App value={CONTEXT} />, scratch);
+		render(<App value={CONTEXT} />);
 		expect(scratch.innerHTML).to.equal(
 			'<div><div><strong>a</strong></div></div>'
 		);
 		expect(Consumed.prototype.render).to.have.been.calledOnce;
 
-		render(<App value={UPDATED_CONTEXT} />, scratch);
+		render(<App value={UPDATED_CONTEXT} />);
 
 		rerender();
 
@@ -486,7 +481,6 @@ describe('createContext', () => {
 					}}
 				</Consumer>
 			</Provider>,
-			scratch
 		);
 
 		// initial render does not invoke anything but render():
@@ -528,7 +522,6 @@ describe('createContext', () => {
 					<Consumer>{data => <Inner {...data} />}</Consumer>
 				</NoUpdate>
 			</Provider>,
-			scratch
 		);
 
 		render(
@@ -537,7 +530,6 @@ describe('createContext', () => {
 					<Consumer>{data => <Inner {...data} />}</Consumer>
 				</NoUpdate>
 			</Provider>,
-			scratch
 		);
 
 		// Rendered twice, should called just one 'Consumer' render
@@ -553,7 +545,6 @@ describe('createContext', () => {
 						<Consumer>{data => <Inner {...data} />}</Consumer>
 					</NoUpdate>
 				</Provider>,
-				scratch
 			);
 		});
 
@@ -597,7 +588,7 @@ describe('createContext', () => {
 		}
 
 		act(() => {
-			render(<App />, scratch);
+			render(<App />);
 		});
 
 		expect(scratch.innerHTML).to.equal('<p>value: initial</p>');
@@ -627,7 +618,6 @@ describe('createContext', () => {
 				<Provider value={CONTEXT}>
 					<Consumer>{data => <Inner {...data} />}</Consumer>
 				</Provider>,
-				scratch
 			);
 
 			// Not calling re-render since it's gonna get called with the same Consumer function
@@ -635,7 +625,6 @@ describe('createContext', () => {
 				<Provider value={CONTEXT}>
 					<Consumer>{data => <Inner {...data} />}</Consumer>
 				</Provider>,
-				scratch
 			);
 		});
 
@@ -672,7 +661,7 @@ describe('createContext', () => {
 			}
 		}
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(scratch.innerHTML).to.equal('<div><div>0</div></div>');
 		expect(Inner).to.have.been.calledOnce;
 
@@ -706,7 +695,7 @@ describe('createContext', () => {
 
 			App.contextType = ctx;
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(actual).to.deep.equal('foo');
 		});
 
@@ -730,7 +719,6 @@ describe('createContext', () => {
 						<App />
 					</Provider>
 				</Provider>,
-				scratch
 			);
 			expect(actual).to.deep.equal('bob');
 		});
@@ -772,7 +760,6 @@ describe('createContext', () => {
 						</NewContext>
 					</OldContext>
 				</Foo.Provider>,
-				scratch
 			);
 
 			expect(spy).to.be.calledWithMatch({ foo: 'foo' });
@@ -804,10 +791,9 @@ describe('createContext', () => {
 				<Foo.Provider value="foo">
 					<App />
 				</Foo.Provider>,
-				scratch
 			);
 
-			render(null, scratch);
+			render(null);
 
 			expect(spy).to.be.calledOnce;
 			expect(spy.getCall(0).args[0]).to.equal(instance);
@@ -871,7 +857,7 @@ describe('createContext', () => {
 				}
 			}
 
-			render(<Root />, scratch);
+			render(<Root />);
 			expect(events).to.deep.equal(['render 0', 'mount 0']);
 
 			update();
@@ -917,7 +903,7 @@ describe('createContext', () => {
 			}
 		}
 
-		render(<Provider />, scratch);
+		render(<Provider />);
 		expect(scratch.innerHTML).to.equal('<p>hi</p>');
 
 		set({ state: 'bye' });

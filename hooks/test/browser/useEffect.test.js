@@ -1,5 +1,5 @@
 import { act } from 'preact/test-utils';
-import { createElement, render, Fragment, Component } from 'preact';
+import { createElement, createRoot, Fragment, Component } from 'preact';
 import { useEffect, useState, useRef } from 'preact/hooks';
 import { setupScratch, teardown } from '../../../test/_util/helpers';
 import { useEffectAssertions } from './useEffectAssertions.test';
@@ -11,8 +11,11 @@ describe('useEffect', () => {
 	/** @type {HTMLDivElement} */
 	let scratch;
 
+	let render;
+
 	beforeEach(() => {
 		scratch = setupScratch();
+		({ render } = createRoot(scratch));
 	});
 
 	afterEach(() => {
@@ -30,13 +33,13 @@ describe('useEffect', () => {
 			return null;
 		}
 
-		render(<Comp />, scratch);
-		render(<Comp />, scratch);
+		render(<Comp />);
+		render(<Comp />);
 
 		expect(cleanupFunction).to.be.not.called;
 		expect(callback).to.be.calledOnce;
 
-		render(<Comp />, scratch);
+		render(<Comp />);
 
 		expect(cleanupFunction).to.be.calledOnce;
 		expect(callback).to.be.calledTwice;
@@ -51,8 +54,8 @@ describe('useEffect', () => {
 			return null;
 		}
 
-		render(<Comp />, scratch);
-		render(null, scratch);
+		render(<Comp />);
+		render(null);
 
 		return scheduleEffectAssert(() => {
 			expect(cleanupFunction).to.not.be.called;
@@ -74,8 +77,8 @@ describe('useEffect', () => {
 			}, [i]);
 			return <p>Test</p>;
 		};
-		act(() => render(<App i={0} />, scratch));
-		act(() => render(<App i={2} />, scratch));
+		act(() => render(<App i={0} />));
+		act(() => render(<App i={2} />));
 		expect(executionOrder).to.deep.equal([
 			'cleanup1',
 			'cleanup2',
@@ -124,7 +127,6 @@ describe('useEffect', () => {
 				<ErrorBoundary>
 					<Parent />
 				</ErrorBoundary>,
-				scratch
 			)
 		);
 
@@ -167,16 +169,16 @@ describe('useEffect', () => {
 			}
 		}
 
-		act(() => render(<App page={1} />, scratch));
+		act(() => render(<App page={1} />));
 		expect(spy).to.not.be.called;
 		expect(scratch.innerHTML).to.equal('<p>loaded</p>');
 
-		act(() => render(<App page={2} />, scratch));
+		act(() => render(<App page={2} />));
 		expect(spy).to.be.calledOnce;
 		expect(scratch.innerHTML).to.equal('<p>Error</p>');
 		errored = false;
 
-		act(() => render(<App page={1} />, scratch));
+		act(() => render(<App page={1} />));
 		expect(spy).to.be.calledOnce;
 		expect(scratch.innerHTML).to.equal('<p>loaded</p>');
 	});
@@ -218,10 +220,10 @@ describe('useEffect', () => {
 			}
 		}
 
-		act(() => render(<App page={2} />, scratch));
+		act(() => render(<App page={2} />));
 		expect(scratch.innerHTML).to.equal('<p>Load</p>');
 
-		act(() => render(<App page={1} />, scratch));
+		act(() => render(<App page={1} />));
 		expect(spy).to.be.calledOnce;
 		expect(scratch.innerHTML).to.equal('<p>Error</p>');
 	});
@@ -253,9 +255,9 @@ describe('useEffect', () => {
 			}
 		}
 
-		render(<App />, scratch);
+		render(<App />);
 		act(() => {
-			render(<App />, scratch);
+			render(<App />);
 		});
 		expect(spy).to.be.calledOnce;
 		expect(errored)
@@ -283,21 +285,22 @@ describe('useEffect', () => {
 
 		const Inner = () => {
 			useEffect(() => {
-				render(<div>global</div>, global);
+				({ render } = createRoot(global));
+				render(<div>global</div>);
 			}, []);
 
 			return <div>Inner</div>;
 		};
 
 		act(() => {
+			({ render } = createRoot(root));
 			render(
 				<Modal
 					content={props => {
 						props.setCanProceed(false);
 						return <Inner />;
 					}}
-				/>,
-				root
+				/>
 			);
 		});
 
@@ -313,12 +316,12 @@ describe('useEffect', () => {
 			return null;
 		}
 
-		render(<Comp />, scratch);
-		render(<Comp />, scratch);
+		render(<Comp />);
+		render(<Comp />);
 
 		expect(callback).to.have.been.calledOnce;
 
-		render(<div>Replacement</div>, scratch);
+		render(<div>Replacement</div>);
 	});
 
 	it('support render roots from an effect', async () => {
@@ -330,7 +333,8 @@ describe('useEffect', () => {
 			useEffect(() => {
 				if (count > 0) {
 					const div = renderRoot.current;
-					return () => render(<Dummy />, div);
+					const subRoot = createRoot(div);
+					return () => subRoot.render(<Dummy />);
 				}
 				return () => 'test';
 			}, [count]);
@@ -355,7 +359,7 @@ describe('useEffect', () => {
 
 		const Dummy = () => <div>dummy</div>;
 
-		render(<Counter />, scratch);
+		render(<Counter />);
 
 		expect(scratch.innerHTML).to.equal(
 			'<div><div>Count: 0</div><div></div></div>'

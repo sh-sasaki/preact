@@ -5,7 +5,8 @@ import {
 	createRef,
 	Component,
 	createContext,
-	Fragment
+	Fragment,
+	createRoot,
 } from 'preact';
 import {
 	useState,
@@ -70,11 +71,9 @@ function cloneElement(element) {
  * @returns {boolean}
  */
 function unmountComponentAtNode(container) {
-	if (container._children) {
-		preactRender(null, container);
-		return true;
-	}
-	return false;
+	// true if no root, otherwise undefined
+	const hadNoRoot = !container._root || container._root.render(null);
+	return !hadNoRoot;
 }
 
 /**
@@ -132,11 +131,13 @@ export {
 	Suspense,
 	SuspenseList,
 	lazy,
-	__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+	__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
+	createRoot,
 };
 
 // React copies the named exports to the default one.
 export default {
+	createRoot,
 	useState,
 	useReducer,
 	useEffect,

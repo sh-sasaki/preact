@@ -1,4 +1,4 @@
-import { createElement, render, createContext, Component } from 'preact';
+import { createElement, createRoot, createContext, Component } from 'preact';
 import { act } from 'preact/test-utils';
 import { setupScratch, teardown } from '../../../test/_util/helpers';
 import { useContext, useEffect, useState } from 'preact/hooks';
@@ -9,8 +9,11 @@ describe('useContext', () => {
 	/** @type {HTMLDivElement} */
 	let scratch;
 
+	let render;
+
 	beforeEach(() => {
 		scratch = setupScratch();
+		({ render } = createRoot(scratch));
 	});
 
 	afterEach(() => {
@@ -27,18 +30,16 @@ describe('useContext', () => {
 			return null;
 		}
 
-		render(<Comp />, scratch);
+		render(<Comp />);
 		render(
 			<Context.Provider value={42}>
 				<Comp />
 			</Context.Provider>,
-			scratch
 		);
 		render(
 			<Context.Provider value={69}>
 				<Comp />
 			</Context.Provider>,
-			scratch
 		);
 
 		expect(values).to.deep.equal([13, 42, 69]);
@@ -53,7 +54,7 @@ describe('useContext', () => {
 			return <div />;
 		}
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(spy).to.be.calledWith(42);
 	});
 
@@ -86,10 +87,10 @@ describe('useContext', () => {
 			return <h1>{value}</h1>;
 		}
 
-		render(<App value={0} />, scratch);
+		render(<App value={0} />);
 		expect(spy).to.be.calledOnce;
 		expect(spy).to.be.calledWith(0);
-		render(<App value={1} />, scratch);
+		render(<App value={1} />);
 
 		// Wait for enqueued hook update
 		setTimeout(() => {
@@ -118,10 +119,10 @@ describe('useContext', () => {
 			return <h1>{value}</h1>;
 		}
 
-		render(<App value={0} />, scratch);
+		render(<App value={0} />);
 		expect(spy).to.be.calledOnce;
 		expect(spy).to.be.calledWith(0);
-		render(<App value={1} />, scratch);
+		render(<App value={1} />);
 
 		expect(spy).to.be.calledTwice;
 		expect(spy).to.be.calledWith(1);
@@ -155,7 +156,6 @@ describe('useContext', () => {
 					<Comp />
 				</Bar.Provider>
 			</Foo.Provider>,
-			scratch
 		);
 
 		expect(spy).to.be.calledOnce;
@@ -167,7 +167,6 @@ describe('useContext', () => {
 					<Comp />
 				</Bar.Provider>
 			</Foo.Provider>,
-			scratch
 		);
 
 		expect(spy).to.be.calledTwice;
@@ -185,13 +184,12 @@ describe('useContext', () => {
 			return null;
 		}
 
-		render(<Comp />, scratch);
+		render(<Comp />);
 
 		render(
 			<Context.Provider ref={p => (provider = p)} value={42}>
 				<Comp />
 			</Context.Provider>,
-			scratch
 		);
 		subSpy = sinon.spy(provider, 'sub');
 
@@ -199,7 +197,6 @@ describe('useContext', () => {
 			<Context.Provider value={69}>
 				<Comp />
 			</Context.Provider>,
-			scratch
 		);
 		expect(subSpy).to.not.have.been.called;
 
@@ -244,11 +241,12 @@ describe('useContext', () => {
 		};
 
 		act(() => {
-			render(<App config={first} />, scratch);
+			render(<App config={first} />);
 
 			// Create a new div to append the `second` case
 			const div = scratch.appendChild(document.createElement('div'));
-			render(<App config={second} />, div);
+			({ render } = createRoot(div));
+			render(<App config={second} />);
 		});
 
 		// Push the expect into the next frame
@@ -288,7 +286,7 @@ describe('useContext', () => {
 			}
 		}
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(scratch.innerHTML).to.equal('<div><div>0</div></div>');
 		expect(Inner).to.have.been.calledOnce;
 
@@ -335,7 +333,7 @@ describe('useContext', () => {
 			);
 		};
 
-		render(<Provider />, scratch);
+		render(<Provider />);
 		expect(scratch.innerHTML).to.equal('<p>hi</p>');
 
 		act(() => {

@@ -1,4 +1,4 @@
-import { createElement, render, createRef, Component, Fragment } from 'preact';
+import { createElement, createRoot, createRef, Component, Fragment } from 'preact';
 import {
 	setupScratch,
 	teardown,
@@ -18,11 +18,13 @@ describe('debug', () => {
 	let scratch;
 	let errors = [];
 	let warnings = [];
+	let render;
 
 	beforeEach(() => {
 		errors = [];
 		warnings = [];
 		scratch = setupScratch();
+		({ render } = createRoot(scratch));
 		sinon.stub(console, 'error').callsFake(e => errors.push(e));
 		sinon.stub(console, 'warn').callsFake(w => warnings.push(w));
 	});
@@ -39,27 +41,33 @@ describe('debug', () => {
 	});
 
 	it('should print an error on rendering on undefined parent', () => {
-		let fn = () => render(<div />, undefined);
+		({ render } = createRoot(undefined));
+		let fn = () => render(<div />);
 		expect(fn).to.throw(/render/);
 	});
 
 	it('should print an error on rendering on invalid parent', () => {
-		let fn = () => render(<div />, 6);
+		({ render } = createRoot(6));
+		let fn = () => render(<div />);
 		expect(fn).to.throw(/valid HTML node/);
 		expect(fn).to.throw(/<div/);
 	});
 
 	it('should print an error with (function) component name when available', () => {
 		const App = () => <div />;
-		let fn = () => render(<App />, 6);
+
+		({ render } = createRoot(6));
+		let fn = () => render(<App />);
 		expect(fn).to.throw(/<App/);
 		expect(fn).to.throw(/6/);
 
-		fn = () => render(<App />, {});
+		({ render } = createRoot({}));
+		fn = () => render(<App />);
 		expect(fn).to.throw(/<App/);
 		expect(fn).to.throw(/[object Object]/);
 
-		fn = () => render(<Fragment />, 'badroot');
+		({ render } = createRoot('badroot'));
+		fn = () => render(<Fragment />);
 		expect(fn).to.throw(/<Fragment/);
 		expect(fn).to.throw(/badroot/);
 	});
@@ -70,28 +78,29 @@ describe('debug', () => {
 				return <div />;
 			}
 		}
-		let fn = () => render(<App />, 6);
+		({ render } = createRoot(6));
+		let fn = () => render(<App />);
 		expect(fn).to.throw(/<App/);
 	});
 
 	it('should print an error on undefined component', () => {
-		let fn = () => render(h(undefined), scratch);
+		let fn = () => render(h(undefined));
 		expect(fn).to.throw(/createElement/);
 	});
 
 	it('should print an error on invalid object component', () => {
-		let fn = () => render(h({}), scratch);
+		let fn = () => render(h({}));
 		expect(fn).to.throw(/createElement/);
 	});
 
 	it('should print an error when component is an array', () => {
-		let fn = () => render(h([<div />]), scratch);
+		let fn = () => render(h([<div />]));
 		expect(fn).to.throw(/createElement/);
 	});
 
 	it('should print an error on double jsx conversion', () => {
 		let Foo = <div />;
-		let fn = () => render(h(<Foo />), scratch);
+		let fn = () => render(h(<Foo />));
 		expect(fn).to.throw(/JSX twice/);
 	});
 
@@ -165,7 +174,7 @@ describe('debug', () => {
 			}
 		}
 
-		render(<Foo />, scratch);
+		render(<Foo />);
 		expect(console.warn).to.be.calledOnce;
 		expect(console.warn.args[0]).to.match(/no-op/);
 	});
@@ -180,7 +189,7 @@ describe('debug', () => {
 			}
 		}
 
-		render(<Foo />, scratch);
+		render(<Foo />);
 		expect(console.warn).to.not.be.called;
 	});
 
@@ -197,10 +206,10 @@ describe('debug', () => {
 			}
 		}
 
-		render(<Foo />, scratch);
+		render(<Foo />);
 		expect(console.warn).to.not.be.called;
 
-		render(null, scratch);
+		render(null);
 
 		setState();
 		expect(console.warn).to.be.calledOnce;
@@ -218,7 +227,7 @@ describe('debug', () => {
 			}
 		}
 
-		render(<Foo />, scratch);
+		render(<Foo />);
 		expect(console.warn).to.be.calledOnce;
 		expect(console.warn.args[0]).to.match(/no-op/);
 	});
@@ -236,11 +245,11 @@ describe('debug', () => {
 			}
 		}
 
-		render(<Foo />, scratch);
+		render(<Foo />);
 		forceUpdate();
 		expect(console.warn).to.not.be.called;
 
-		render(null, scratch);
+		render(null);
 
 		forceUpdate();
 		expect(console.warn).to.be.calledOnce;
@@ -248,42 +257,42 @@ describe('debug', () => {
 	});
 
 	it('should print an error when child is a plain object', () => {
-		let fn = () => render(<div>{{}}</div>, scratch);
+		let fn = () => render(<div>{{}}</div>);
 		expect(fn).to.throw(/not valid/);
 	});
 
 	it('should print an error on invalid refs', () => {
-		let fn = () => render(<div ref="a" />, scratch);
+		let fn = () => render(<div ref="a" />);
 		expect(fn).to.throw(/createRef/);
 	});
 
 	it('should not print for null as a handler', () => {
-		let fn = () => render(<div onclick={null} />, scratch);
+		let fn = () => render(<div onclick={null} />);
 		expect(fn).not.to.throw();
 	});
 
 	it('should not print for undefined as a handler', () => {
-		let fn = () => render(<div onclick={undefined} />, scratch);
+		let fn = () => render(<div onclick={undefined} />);
 		expect(fn).not.to.throw();
 	});
 
 	it('should not print for attributes starting with on for Components', () => {
 		const Comp = () => <p>online</p>;
-		let fn = () => render(<Comp online={false} />, scratch);
+		let fn = () => render(<Comp online={false} />);
 		expect(fn).not.to.throw();
 	});
 
 	it('should print an error on invalid handler', () => {
-		let fn = () => render(<div onclick="a" />, scratch);
+		let fn = () => render(<div onclick="a" />);
 		expect(fn).to.throw(/"onclick" property should be a function/);
 	});
 
 	it('should NOT print an error on valid refs', () => {
 		let noop = () => {};
-		render(<div ref={noop} />, scratch);
+		render(<div ref={noop} />);
 
 		let ref = createRef();
-		render(<div ref={ref} />, scratch);
+		render(<div ref={ref} />);
 		expect(console.error).to.not.be.called;
 	});
 
@@ -339,7 +348,7 @@ describe('debug', () => {
 				);
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -363,7 +372,7 @@ describe('debug', () => {
 				);
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(console.error).to.be.calledTwice;
 		});
 	});
@@ -375,7 +384,7 @@ describe('debug', () => {
 					<td>hi</td>
 				</tr>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -387,7 +396,7 @@ describe('debug', () => {
 					</tr>
 				</thead>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -399,7 +408,7 @@ describe('debug', () => {
 					</tr>
 				</tbody>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -411,7 +420,7 @@ describe('debug', () => {
 					</tr>
 				</tfoot>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -423,7 +432,7 @@ describe('debug', () => {
 					</tbody>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -436,7 +445,7 @@ describe('debug', () => {
 					</tbody>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -449,7 +458,7 @@ describe('debug', () => {
 					</tbody>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -463,7 +472,7 @@ describe('debug', () => {
 					</thead>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.not.be.called;
 		});
 
@@ -488,7 +497,7 @@ describe('debug', () => {
 					</tfoot>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.not.be.called;
 		});
 
@@ -512,7 +521,7 @@ describe('debug', () => {
 					</tfoot>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.not.be.called;
 		});
 
@@ -527,7 +536,7 @@ describe('debug', () => {
 					</tr>
 				</table>
 			);
-			render(<Table />, scratch);
+			render(<Table />);
 			expect(console.error).to.not.be.called;
 		});
 	});
@@ -546,7 +555,7 @@ describe('debug', () => {
 				text: PropTypes.string.isRequired
 			};
 
-			render(<Foo text={123} />, scratch);
+			render(<Foo text={123} />);
 
 			expect(console.error).to.be.calledOnce;
 
@@ -572,15 +581,15 @@ describe('debug', () => {
 
 			// Trigger the same error twice. The error should only be logged
 			// once.
-			render(<Foo text={123} />, scratch);
-			render(<Foo text={123} />, scratch);
+			render(<Foo text={123} />);
+			render(<Foo text={123} />);
 
 			expect(console.error).to.be.calledOnce;
 
 			// Trigger a different error. This should result in a new log
 			// message.
 			console.error.resetHistory();
-			render(<Foo text="ok" count="123" />, scratch);
+			render(<Foo text="ok" count="123" />);
 			expect(console.error).to.be.calledOnce;
 		});
 
@@ -595,7 +604,7 @@ describe('debug', () => {
 				}
 			};
 
-			render(<Baz unhappy={'signal'} />, scratch);
+			render(<Baz unhappy={'signal'} />);
 
 			expect(console.error).to.be.calledOnce;
 			expect(errors[0].includes('got prop')).to.equal(true);
@@ -611,7 +620,7 @@ describe('debug', () => {
 				text: PropTypes.string.isRequired
 			};
 
-			render(<Bar text="foo" />, scratch);
+			render(<Bar text="foo" />);
 			expect(console.error).to.not.be.called;
 		});
 	});

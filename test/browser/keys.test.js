@@ -1,4 +1,4 @@
-import { createElement, Component, render } from 'preact';
+import { createElement, Component, createRoot } from 'preact';
 import { setupScratch, teardown } from '../_util/helpers';
 import { logCall, clearLog, getLog } from '../_util/logCall';
 import { div } from '../_util/dom';
@@ -7,7 +7,7 @@ import { div } from '../_util/dom';
 
 describe('keys', () => {
 	/** @type {HTMLDivElement} */
-	let scratch;
+	let scratch, render;
 
 	/** @type {string[]} */
 	let ops;
@@ -71,6 +71,7 @@ describe('keys', () => {
 
 	beforeEach(() => {
 		scratch = setupScratch();
+		({ render } = createRoot(scratch));
 		ops = [];
 	});
 
@@ -82,7 +83,7 @@ describe('keys', () => {
 	// https://fb.me/react-special-props
 	it('should not pass key in props', () => {
 		const Foo = sinon.spy(() => null);
-		render(<Foo key="foo" />, scratch);
+		render(<Foo key="foo" />);
 		expect(Foo.args[0][0]).to.deep.equal({});
 	});
 
@@ -94,7 +95,6 @@ describe('keys', () => {
 				<li key="a">a</li>
 				<li key="b">b</li>
 			</div>,
-			scratch
 		);
 
 		render(
@@ -103,7 +103,6 @@ describe('keys', () => {
 				<li key="b">b</li>
 				<li key="c">c</li>
 			</div>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(
@@ -147,9 +146,9 @@ describe('keys', () => {
 			}
 		}
 
-		render(<App />, scratch);
-		render(<App opened loading />, scratch);
-		render(<App opened />, scratch);
+		render(<App />);
+		render(<App opened loading />);
+		render(<App opened />);
 
 		const html = String(scratch.firstChild.innerHTML).replace(/ class=""/g, '');
 		expect(html).to.equal(
@@ -160,13 +159,13 @@ describe('keys', () => {
 	it('should append new keyed elements', () => {
 		const values = ['a', 'b'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('ab');
 
 		values.push('c');
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abc');
 		expect(getLog()).to.deep.equal([
 			'<li>.appendChild(#text)',
@@ -177,13 +176,13 @@ describe('keys', () => {
 	it('should remove keyed elements from the end', () => {
 		const values = ['a', 'b', 'c', 'd'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abcd');
 
 		values.pop();
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abc');
 		expect(getLog()).to.deep.equal(['<li>d.remove()']);
 	});
@@ -191,13 +190,13 @@ describe('keys', () => {
 	it('should prepend keyed elements to the beginning', () => {
 		const values = ['b', 'c'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('bc');
 
 		values.unshift('a');
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abc');
 		expect(getLog()).to.deep.equal([
 			'<li>.appendChild(#text)',
@@ -208,13 +207,13 @@ describe('keys', () => {
 	it('should remove keyed elements from the beginning', () => {
 		const values = ['z', 'a', 'b', 'c'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('zabc');
 
 		values.shift();
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abc');
 		expect(getLog()).to.deep.equal(['<li>z.remove()']);
 	});
@@ -222,13 +221,13 @@ describe('keys', () => {
 	it('should insert new keyed children in the middle', () => {
 		const values = ['a', 'c'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('ac');
 
 		values.splice(1, 0, 'b');
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abc');
 		expect(getLog()).to.deep.equal([
 			'<li>.appendChild(#text)',
@@ -239,13 +238,13 @@ describe('keys', () => {
 	it('should remove keyed children from the middle', () => {
 		const values = ['a', 'b', 'x', 'y', 'z', 'c', 'd'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abxyzcd');
 
 		values.splice(2, 3);
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abcd');
 		expect(getLog()).to.deep.equal([
 			'<li>z.remove()',
@@ -255,12 +254,12 @@ describe('keys', () => {
 	});
 
 	it('should swap keyed children efficiently', () => {
-		render(<List values={['a', 'b']} />, scratch);
+		render(<List values={['a', 'b']} />);
 		expect(scratch.textContent).to.equal('ab');
 
 		clearLog();
 
-		render(<List values={['b', 'a']} />, scratch);
+		render(<List values={['b', 'a']} />);
 		expect(scratch.textContent).to.equal('ba');
 
 		expect(getLog()).to.deep.equal(['<ol>ab.appendChild(<li>a)']);
@@ -269,14 +268,14 @@ describe('keys', () => {
 	it('should swap existing keyed children in the middle of a list efficiently', () => {
 		const values = ['a', 'b', 'c', 'd'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abcd');
 
 		// swap
 		move(values, 1, 2);
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('acbd', 'initial swap');
 		expect(getLog()).to.deep.equal(
 			['<ol>abcd.insertBefore(<li>b, <li>d)'],
@@ -287,7 +286,7 @@ describe('keys', () => {
 		move(values, 2, 1);
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abcd', 'swap back');
 		expect(getLog()).to.deep.equal(
 			['<ol>acbd.insertBefore(<li>c, <li>d)'],
@@ -298,14 +297,14 @@ describe('keys', () => {
 	it('should move keyed children to the end of the list', () => {
 		const values = ['a', 'b', 'c', 'd'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abcd');
 
 		// move to end
 		move(values, 0, values.length - 1);
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('bcda', 'move to end');
 		expect(getLog()).to.deep.equal(
 			['<ol>abcd.appendChild(<li>a)'],
@@ -316,7 +315,7 @@ describe('keys', () => {
 		move(values, values.length - 1, 0);
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal('abcd', 'move to beginning');
 		expect(getLog()).to.deep.equal(
 			['<ol>bcda.insertBefore(<li>a, <li>b)'],
@@ -327,14 +326,14 @@ describe('keys', () => {
 	it('should reverse keyed children effectively', () => {
 		const values = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal(values.join(''));
 
 		// reverse list
 		values.reverse();
 		clearLog();
 
-		render(<List values={values} />, scratch);
+		render(<List values={values} />);
 		expect(scratch.textContent).to.equal(values.join(''));
 		expect(getLog()).to.deep.equal([
 			'<ol>abcdefghij.insertBefore(<li>j, <li>a)',
@@ -357,12 +356,12 @@ describe('keys', () => {
 		}
 
 		ops = [];
-		render(<Foo condition />, scratch);
+		render(<Foo condition />);
 		expect(scratch.innerHTML).to.equal('<div>Stateful</div>');
 		expect(ops).to.deep.equal(['Mount Stateful'], 'initial mount');
 
 		ops = [];
-		render(<Foo condition={false} />, scratch);
+		render(<Foo condition={false} />);
 		expect(scratch.innerHTML).to.equal('<div>Stateful</div>');
 		expect(ops).to.deep.equal(
 			['Unmount Stateful', 'Mount Stateful'],
@@ -370,7 +369,7 @@ describe('keys', () => {
 		);
 
 		ops = [];
-		render(<Foo condition />, scratch);
+		render(<Foo condition />);
 		expect(scratch.innerHTML).to.equal('<div>Stateful</div>');
 		expect(ops).to.deep.equal(
 			['Unmount Stateful', 'Mount Stateful'],
@@ -388,12 +387,12 @@ describe('keys', () => {
 		}
 
 		ops = [];
-		render(<Foo keyed />, scratch);
+		render(<Foo keyed />);
 		expect(scratch.innerHTML).to.equal('<div>Stateful</div>');
 		expect(ops).to.deep.equal(['Mount Stateful'], 'initial mount with key');
 
 		ops = [];
-		render(<Foo keyed={false} />, scratch);
+		render(<Foo keyed={false} />);
 		expect(scratch.innerHTML).to.equal('<div>Stateful</div>');
 		expect(ops).to.deep.equal(
 			['Unmount Stateful', 'Mount Stateful'],
@@ -401,7 +400,7 @@ describe('keys', () => {
 		);
 
 		ops = [];
-		render(<Foo keyed />, scratch);
+		render(<Foo keyed />);
 		expect(scratch.innerHTML).to.equal('<div>Stateful</div>');
 		expect(ops).to.deep.equal(
 			['Unmount Stateful', 'Mount Stateful'],
@@ -446,7 +445,7 @@ describe('keys', () => {
 		]);
 
 		ops = [];
-		render(<Foo moved={false} />, scratch);
+		render(<Foo moved={false} />);
 
 		expect(scratch.innerHTML).to.equal(expectedHtml);
 		expect(ops).to.deep.equal(['Mount Stateful1', 'Mount Stateful2']);
@@ -454,7 +453,7 @@ describe('keys', () => {
 		expect(Stateful2Ref).to.exist;
 
 		ops = [];
-		render(<Foo moved />, scratch);
+		render(<Foo moved />);
 
 		expect(scratch.innerHTML).to.equal(expectedHtml);
 		expect(ops).to.deep.equal([
@@ -467,7 +466,7 @@ describe('keys', () => {
 		expect(Stateful2MovedRef).to.not.equal(Stateful2Ref);
 
 		ops = [];
-		render(<Foo moved={false} />, scratch);
+		render(<Foo moved={false} />);
 
 		expect(scratch.innerHTML).to.equal(expectedHtml);
 		expect(ops).to.deep.equal([
@@ -530,7 +529,7 @@ describe('keys', () => {
 		]);
 
 		ops = [];
-		render(<Foo moved={false} />, scratch);
+		render(<Foo moved={false} />);
 
 		expect(scratch.innerHTML).to.equal(htmlForFalse);
 		expect(ops).to.deep.equal(['Mount Stateful1', 'Mount Stateful2']);
@@ -538,7 +537,7 @@ describe('keys', () => {
 		expect(Stateful2Ref).to.exist;
 
 		ops = [];
-		render(<Foo moved />, scratch);
+		render(<Foo moved />);
 
 		expect(scratch.innerHTML).to.equal(htmlForTrue);
 		expect(ops).to.deep.equal(['Update Stateful2', 'Update Stateful1']);
@@ -546,7 +545,7 @@ describe('keys', () => {
 		expect(Stateful2MovedRef).to.equal(Stateful2Ref);
 
 		ops = [];
-		render(<Foo moved={false} />, scratch);
+		render(<Foo moved={false} />);
 
 		expect(scratch.innerHTML).to.equal(htmlForFalse);
 		expect(ops).to.deep.equal(['Update Stateful1', 'Update Stateful2']);
@@ -591,7 +590,7 @@ describe('keys', () => {
 		]);
 
 		ops = [];
-		render(<Foo unkeyed={false} />, scratch);
+		render(<Foo unkeyed={false} />);
 
 		expect(scratch.innerHTML).to.equal(expectedHtml);
 		expect(ops).to.deep.equal(['Mount Stateful1', 'Mount Stateful2']);
@@ -599,7 +598,7 @@ describe('keys', () => {
 		expect(Stateful2Ref).to.exist;
 
 		ops = [];
-		render(<Foo unkeyed />, scratch);
+		render(<Foo unkeyed />);
 
 		expect(scratch.innerHTML).to.equal(expectedHtml);
 		expect(ops).to.deep.equal([
@@ -612,7 +611,7 @@ describe('keys', () => {
 		expect(Stateful2MovedRef).to.not.equal(Stateful2Ref);
 
 		ops = [];
-		render(<Foo unkeyed={false} />, scratch);
+		render(<Foo unkeyed={false} />);
 
 		expect(scratch.innerHTML).to.equal(expectedHtml);
 		expect(ops).to.deep.equal([

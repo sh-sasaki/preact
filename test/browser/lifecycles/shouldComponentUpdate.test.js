@@ -1,5 +1,5 @@
 import { setupRerender } from 'preact/test-utils';
-import { createElement, render, Component, Fragment } from 'preact';
+import { createElement, createRoot, Component, Fragment } from 'preact';
 import { setupScratch, teardown } from '../../_util/helpers';
 import { logCall, clearLog } from '../../_util/logCall';
 
@@ -12,28 +12,22 @@ describe('Lifecycle methods', () => {
 	/** @type {() => void} */
 	let rerender;
 
+	let render;
+
 	// function expectDomLogToBe(expectedOperations, message) {
 	// 	expect(getLog()).to.deep.equal(expectedOperations, message);
 	// }
-	let resetInsertBefore;
-	let resetRemoveChild;
-	let resetRemove;
 
 	before(() => {
-		resetInsertBefore = logCall(Element.prototype, 'insertBefore');
-		resetRemoveChild = logCall(Element.prototype, 'appendChild');
-		resetRemove = logCall(Element.prototype, 'removeChild');
-	});
-
-	after(() => {
-		resetInsertBefore();
-		resetRemoveChild();
-		resetRemove();
+		logCall(Node.prototype, 'insertBefore');
+		logCall(Node.prototype, 'appendChild');
+		logCall(Node.prototype, 'removeChild');
 	});
 
 	beforeEach(() => {
 		scratch = setupScratch();
 		rerender = setupRerender();
+		({ render } = createRoot(scratch));
 
 		clearLog();
 	});
@@ -68,7 +62,7 @@ describe('Lifecycle methods', () => {
 		beforeEach(() => Should.prototype.render.resetHistory());
 
 		it('should rerender component on change by default', () => {
-			render(<Should />, scratch);
+			render(<Should />);
 			setState({ show: false });
 			rerender();
 
@@ -76,7 +70,7 @@ describe('Lifecycle methods', () => {
 		});
 
 		it('should not rerender component if shouldComponentUpdate returns false', () => {
-			render(<ShouldNot />, scratch);
+			render(<ShouldNot />);
 			setState({ show: false });
 			rerender();
 
@@ -113,10 +107,10 @@ describe('Lifecycle methods', () => {
 				</div>
 			);
 
-			render(<App sortBy="a" />, scratch);
+			render(<App sortBy="a" />);
 			expect(scratch.innerHTML).to.equal('<div><table>231</table></div>');
 
-			render(<App sortBy="b" />, scratch);
+			render(<App sortBy="b" />);
 			expect(scratch.innerHTML).to.equal('<div><table>312</table></div>');
 		});
 
@@ -140,7 +134,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 
 			c.setState({});
 			rerender();
@@ -172,7 +166,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 
 			c.setState({});
 			rerender();
@@ -205,7 +199,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(renders).to.equal(1);
 
 			c.setState({}, spy);
@@ -234,7 +228,7 @@ describe('Lifecycle methods', () => {
 			sinon.spy(Foo.prototype, 'shouldComponentUpdate');
 			sinon.spy(Foo.prototype, 'render');
 
-			render(<Foo />, scratch);
+			render(<Foo />);
 			Comp.forceUpdate();
 			rerender();
 
@@ -262,7 +256,7 @@ describe('Lifecycle methods', () => {
 			sinon.spy(Foo.prototype, 'shouldComponentUpdate');
 			sinon.spy(Foo.prototype, 'render');
 
-			render(<Foo />, scratch);
+			render(<Foo />);
 			Comp.forceUpdate();
 			Comp.setState({});
 			rerender();
@@ -301,7 +295,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 
 			updateOuter();
 			updateInner();
@@ -365,7 +359,7 @@ describe('Lifecycle methods', () => {
 
 			// Initial render
 			// state.value: initialized to 0 in constructor, 0 -> 1 in gDSFP
-			render(<Foo foo="foo" />, scratch);
+			render(<Foo foo="foo" />);
 			expect(scratch.firstChild.textContent).to.be.equal('1');
 			expect(curProps).to.be.undefined;
 			expect(curState).to.be.undefined;
@@ -374,7 +368,7 @@ describe('Lifecycle methods', () => {
 
 			// New props
 			// state.value: 1 -> 2 in gDSFP
-			render(<Foo foo="bar" />, scratch);
+			render(<Foo foo="bar" />);
 			expect(scratch.firstChild.textContent).to.be.equal('2');
 			expect(curProps).to.deep.equal({ foo: 'foo' });
 			expect(curState).to.deep.equal({ value: 1 });
@@ -412,8 +406,8 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<Foo foo="foo" />, scratch);
-			render(<Foo foo="bar" />, scratch);
+			render(<Foo foo="foo" />);
+			render(<Foo foo="bar" />);
 			expect(spy).to.be.calledOnce;
 
 			updateState();
@@ -442,7 +436,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<Foo />, scratch);
+			render(<Foo />);
 			updateState();
 			rerender();
 
@@ -503,7 +497,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(scratch.textContent).to.equal('');
 
 			updateChild();
@@ -573,7 +567,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(scratch.textContent).to.equal('foo');
 
 			updateChild();
@@ -642,8 +636,7 @@ describe('Lifecycle methods', () => {
 					<Two>
 						<Three />
 					</Two>
-				</One>,
-				scratch
+				</One>
 			);
 			expect(scratch.innerHTML).to.equal('<span>1</span>');
 
@@ -705,7 +698,7 @@ describe('Lifecycle methods', () => {
 				}
 			}
 
-			render(<App />, scratch);
+			render(<App />);
 			expect(scratch.textContent).to.equal('foo');
 
 			updateChild();
@@ -740,13 +733,13 @@ describe('Lifecycle methods', () => {
 			}
 		}
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(scratch.innerHTML).to.equal('<div>Hello World!</div>');
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(scratch.innerHTML).to.equal('<div>Hello World!</div>');
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(scratch.innerHTML).to.equal('<div>Hello World!</div>');
 	});
 
@@ -778,7 +771,7 @@ describe('Lifecycle methods', () => {
 			</Wrapper>
 		);
 
-		render(<App />, scratch);
+		render(<App />);
 		expect(scratch.innerHTML).to.equal('<p>baz</p>');
 
 		wrapperSetState({ hi: 'world' });
@@ -829,7 +822,7 @@ describe('Lifecycle methods', () => {
 			</div>
 		);
 
-		render(<App sortBy="a" />, scratch);
+		render(<App sortBy="a" />);
 		expect(scratch.innerHTML).to.equal(
 			`<div><table>${[
 				'<div>id: 2</div><div>a: 50</div><div>b: 10</div>',
@@ -839,7 +832,7 @@ describe('Lifecycle methods', () => {
 		);
 
 		clearLog();
-		render(<App sortBy="b" />, scratch);
+		render(<App sortBy="b" />);
 		expect(scratch.innerHTML).to.equal(
 			`<div><table>${[
 				'<div>id: 3</div><div>a: 25</div><div>b: 1000</div>',

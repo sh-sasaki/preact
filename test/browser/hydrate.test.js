@@ -1,4 +1,4 @@
-import { createElement, hydrate, Fragment } from 'preact';
+import { createElement, createRoot, Fragment } from 'preact';
 import {
 	setupScratch,
 	teardown,
@@ -12,7 +12,7 @@ import { logCall, clearLog, getLog } from '../_util/logCall';
 /** @jsx createElement */
 
 describe('hydrate()', () => {
-	let scratch, attributesSpy;
+	let scratch, attributesSpy, hydrate;
 
 	const List = ({ children }) => <ul>{children}</ul>;
 	const ListItem = ({ children }) => <li>{children}</li>;
@@ -45,6 +45,7 @@ describe('hydrate()', () => {
 	beforeEach(() => {
 		scratch = setupScratch();
 		attributesSpy = spyOnElementAttributes();
+		({ hydrate } = createRoot(scratch));
 	});
 
 	afterEach(() => {
@@ -64,7 +65,6 @@ describe('hydrate()', () => {
 				<li>2</li>
 				<li>3</li>
 			</ul>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -83,7 +83,6 @@ describe('hydrate()', () => {
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
 			</List>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -102,7 +101,6 @@ describe('hydrate()', () => {
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
 			</List>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(ul([li('1'), li('2'), li('3')]));
@@ -126,7 +124,6 @@ describe('hydrate()', () => {
 				<ListItem>2</ListItem>
 				<ListItem>3</ListItem>
 			</List>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(ul([li('1'), li('2'), li('3')]));
@@ -145,7 +142,7 @@ describe('hydrate()', () => {
 		);
 
 		clearLog();
-		hydrate(vnode, scratch);
+		hydrate(vnode);
 
 		expect(attributesSpy.get).to.not.have.been.called;
 		expect(serializeHtml(scratch)).to.equal(
@@ -158,7 +155,7 @@ describe('hydrate()', () => {
 
 	it('should update class attribute via className prop', () => {
 		scratch.innerHTML = '<div class="foo">bar</div>';
-		hydrate(<div className="foo">bar</div>, scratch);
+		hydrate(<div className="foo">bar</div>);
 		expect(scratch.innerHTML).to.equal('<div class="foo">bar</div>');
 	});
 
@@ -177,7 +174,6 @@ describe('hydrate()', () => {
 				</Fragment>
 				<ListItem>4</ListItem>
 			</List>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -205,7 +201,6 @@ describe('hydrate()', () => {
 				</List>
 				<div>sibling</div>
 			</Fragment>,
-			scratch
 		);
 
 		expect(scratch.innerHTML).to.equal(html);
@@ -238,7 +233,6 @@ describe('hydrate()', () => {
 				</List>
 				<div>sibling</div>
 			</Fragment>,
-			scratch
 		);
 
 		const finalHtml = [
@@ -268,7 +262,7 @@ describe('hydrate()', () => {
 			</div>
 		);
 
-		hydrate(preactElement, scratch);
+		hydrate(preactElement);
 		expect(attributesSpy.get).to.not.have.been.called;
 		expect(scratch).to.have.property(
 			'innerHTML',
@@ -281,7 +275,7 @@ describe('hydrate()', () => {
 		scratch.innerHTML = '<span>Test</span>';
 		let vnode = <span onClick={spy}>Test</span>;
 
-		hydrate(vnode, scratch);
+		hydrate(vnode);
 
 		scratch.firstChild.click();
 		expect(spy).to.be.calledOnce;
@@ -323,7 +317,7 @@ describe('hydrate()', () => {
 			);
 		};
 
-		hydrate(<App />, scratch);
+		hydrate(<App />);
 		expect(scratch.innerHTML).to.equal(
 			'<select><option value="0">Zero</option><option selected="" value="2">Two</option></select>'
 		);
@@ -333,12 +327,12 @@ describe('hydrate()', () => {
 		scratch.innerHTML = '<div id="test"><p class="hi">hello bar</p></div>';
 		const Component = props => <p class="hi">hello {props.foo}</p>;
 		const element = document.getElementById('test');
+		({ hydrate } = createRoot(element));
 		hydrate(
 			<Fragment>
 				<Component foo="bar" />
 				<Component foo="baz" />
 			</Fragment>,
-			element
 		);
 		expect(element.innerHTML).to.equal(
 			'<p class="hi">hello bar</p><p class="hi">hello baz</p>'
@@ -349,12 +343,12 @@ describe('hydrate()', () => {
 		scratch.innerHTML = '<div id="test"><p class="hi">hello bar</p></div>';
 		const Component = props => <p class="hi">hello {props.foo}</p>;
 		const element = document.getElementById('test');
+		({ hydrate } = createRoot(element));
 		hydrate(
 			<Fragment>
 				<Component foo="baz" />
 				<Component foo="bar" />
-			</Fragment>,
-			element
+			</Fragment>
 		);
 		expect(element.innerHTML).to.equal(
 			'<p class="hi">hello baz</p><p class="hi">hello bar</p>'
