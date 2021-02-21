@@ -5,6 +5,7 @@ import { Component } from '../component';
 import { mountChildren } from './mount';
 import { diffChildren, reorderChildren } from './children';
 import { DIRTY_BIT, FORCE_UPDATE, TYPE_ROOT } from '../constants';
+import { getChildDom } from '../tree';
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -154,8 +155,9 @@ export function renderComponent(
 	if (internal._flags & TYPE_ROOT) {
 		parentDom = newProps._parentDom;
 
-		if (internal && internal._dom) {
-			startDom = internal._dom;
+		let newStartDom = getChildDom(internal);
+		if (newStartDom) {
+			startDom = newStartDom;
 		}
 
 		// The `startDom` variable might point to a node from another
